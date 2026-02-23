@@ -1,42 +1,64 @@
 #include <bits/stdc++.h>
+#define INF (int)1e9
 using namespace std;
+
+vector<vector<pair<int,int>>> graph;
+
+vector<int> dijkstra(int s){
+
+    vector<int> dist(graph.size(), INF);
+    priority_queue<pair<int,int>> pq;
+
+    dist[s] = 0;
+    pq.push({0, s});
+
+    while(!pq.empty()){
+        auto cv = pq.top();
+        pq.pop();
+
+        int curDist = -cv.first;
+        int cur = cv.second;
+
+        if(curDist > dist[cur]) continue;
+
+        for(auto nxt : graph[cur]){
+            int nxtNode = nxt.first;
+            int w = nxt.second;
+
+            int nxtDist = curDist+w;
+
+            if(dist[nxtNode] > nxtDist){
+                dist[nxtNode] = nxtDist;
+                pq.push({-nxtDist, nxtNode});
+            }
+        }
+    }
+
+    return dist;
+}
 
 int main() {
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
 
-    int N, M;
-    cin >> N >> M;
+    int V,E;
+    cin>>V>>E;
 
-    vector<vector<int>> graph(N + 1);
-    vector<int> indeg(N + 1, 0);
+    graph.assign(V+1, vector<pair<int,int>>());
 
-    int a, b;
-    for (int i = 0; i < M; ++i) {
-        cin >> a >> b;
-        graph[a].push_back(b);
-        ++indeg[b];
+    int K;
+    cin>>K;
+
+    int u,v,w;
+    for(int i=0;i<E;++i){
+        cin>>u>>v>>w;
+        graph[u].push_back({v,w});
     }
 
-    priority_queue<int, vector<int>, greater<int>> pq;
-
-    for (int i = 1; i <= N; ++i) {
-        if (indeg[i] == 0)
-            pq.push(i);
-    }
-
-    int u;
-    while (!pq.empty()) {
-        u = pq.top();
-        pq.pop();
-
-        cout << u << ' ';
-
-        for (int v : graph[u]) {
-            --indeg[v];
-            if (indeg[v] == 0)
-                pq.push(v);
-        }
+    vector<int> ans = dijkstra(K);
+    for(int i=1;i<=V;++i ){
+        if(ans[i]==INF) cout<<"INF\n";
+        else cout<<ans[i]<<'\n';
     }
 
     return 0;
