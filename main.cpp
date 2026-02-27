@@ -1,82 +1,67 @@
 #include <bits/stdc++.h>
-#define INF (int)1e9
+#define INF (long long)4e18
 using namespace std;
 
-vector<vector<pair<int,int>>> graph;    // graph[i][j] = i와 인접한 j번째의 {거리, 정점}
+vector<vector<pair<int,int>>> graph;
 
-vector<int> dijkstra(int s){
-    vector<int> dist(graph.size(), INF);
-    dist[s] = 0;
+vector<long long> bellmanFord(int st){
 
-    priority_queue<pair<int,int>> pq; //s에서 c까지의 {-거리, c}
-    
-    pq.push({0,s});
-    while(!pq.empty()){
-        auto [cD, cV] = pq.top();
-        cD*=-1;
-        pq.pop();
+    int V = graph.size() - 1;
+    vector<long long> upper(graph.size(), INF);
 
-        if(cD>dist[cV]) continue;
+    upper[st] = 0;
 
-        for(auto [iD, iV] : graph[cV]){
-            if(cD+iD<dist[iV]){
-                dist[iV] = cD+iD;
-                pq.push({-dist[iV], iV});
+    // V-1번 완화
+    for(int i = 1; i <= V-1; ++i){
+        for(int j = 1; j <= V; ++j){
+            for(auto v : graph[j]){
+                if(upper[j] != INF &&
+                   upper[v.second] > upper[j] + v.first){
+                    upper[v.second] = upper[j] + v.first;
+                }
             }
         }
     }
-    
-    return dist;
-}
 
-void solve(){
-    int n,m,t;
-    cin>>n>>m>>t;
-
-    graph.assign(n+1,vector<pair<int,int>>());
-
-    int s,g,h;
-    cin>>s>>g>>h;
-
-    int a,b,d;
-   while(m--){
-        cin>>a>>b>>d;
-        graph[a].push_back({d,b});
-        graph[b].push_back({d,a});
+    // 음수 사이클 검사
+    for(int j = 1; j <= V; ++j){
+        for(auto v : graph[j]){
+            if(upper[j] != INF &&
+               upper[v.second] > upper[j] + v.first){
+                return {};
+            }
+        }
     }
 
-    int x;
-    vector<int> distS = dijkstra(s);
-    vector<int> distG = dijkstra(g);
-    vector<int> distH = dijkstra(h);
-
-    int distS_G_H = distS[g]+distG[h];
-    int distS_H_G = distS[h]+distH[g];
-
-    priority_queue<int> ans;
-    while(t--){
-        cin>>x;
-        if(distS_G_H+distH[x]==distS[x] ||
-        distS_H_G+distG[x]==distS[x]) ans.push(-x);
-    }
-
-    int i;
-    while(!ans.empty()){
-        i = ans.top();
-        ans.pop();
-        cout<<-i<<' ';
-    }
-    cout<<'\n';
+    return upper;
 }
 
 int main() {
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
 
-    int T;
-    cin>>T;
+    int N,M;
+    cin>>N>>M;
 
-    while(T--) solve();
-    
+    graph.assign(N+1, vector<pair<int,int>>());
+
+    int a,b,c;
+    while(M--){
+        cin>>a>>b>>c;
+        graph[a].push_back({c,b});
+    }
+
+    vector<long long> dist = bellmanFord(1);
+
+    if(dist.empty()){
+        cout<<-1;
+    }
+    else{
+        for(int i=2;i<=N;++i){
+            if(dist[i]==INF) cout<<-1<<'\n';
+            else cout<<dist[i]<<'\n';
+        }
+    }
+
     return 0;
 }
