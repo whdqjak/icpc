@@ -2,34 +2,42 @@
 #define INF (int)1e9
 using namespace std;
 
-int arr[100000];
+
+int arr[100001];
 
 int main() {
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
 
-    int n;
-    cin>>n;
+    int N,S;
 
-    for(int i=0;i<n;++i) cin>>arr[i];
+    cin>>N>>S;
 
-    int x;
-    cin>>x;
-
-    sort(arr,arr+n);
-    int s=0;
-    int e=n-1;
-
-    int c;
-    int cnt=0;
-    while(s<e){
-        c=arr[s]+arr[e];
-        if(c>x) --e;
-        else if(c<x) ++s;
-        else ++cnt, ++s, --e;
+    arr[0]=0;
+    for(int i=1;i<=N;++i){
+        cin>>arr[i];
+        arr[i]+=arr[i-1];
     }
 
-    cout<<cnt;
+    int p1,p2;
+
+    p1=0;
+    p2=1;
+
+    int c;
+    int ans = INF; 
+    while(p2>p1 && p2<=N){
+        c = arr[p2]-arr[p1];
+
+        if(c<S) ++p2;
+        else{
+            if(ans>p2-p1) ans = p2-p1;
+            ++p1;
+        }
+    }
+
+    if(ans==INF) cout<<0;
+    else cout<<ans;
 
     return 0;
 }
