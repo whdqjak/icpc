@@ -2,52 +2,58 @@
 #define INF (int)1e9
 using namespace std;
 
-bool ets[(int)4e6 + 1];
-void etsF(int n){
-    
-    memset(ets, 1, sizeof(ets));
-    ets[0]=ets[1]=0;
+int arr[30];
 
-    for(int i=2;i*i<=n;++i){
-        if(ets[i])
-            for(int j=i*i;j<=n;j+=i) ets[j]=0;
+vector<int> subset(int* arr, int n, int lim){
+
+    vector<int> set;
+
+    int c;
+    bool f;
+    for(int bit=0;bit<(1<<n);++bit){
+        c=0;
+        f=1;
+        for(int i=0;i<n;++i){
+            if(bit&(1<<i)){
+                c+=arr[i];
+                if(c>lim){
+                    f=0;
+                    break;
+                }
+            }
+        }
+        
+        if(f) set.push_back(c);
     }
-
+    return set;
 }
 
 int main() {
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
 
-    int N;
-    cin>>N;
+    int N,C;
+    cin>>N>>C;
 
-    etsF(N);
+    for(int i=0;i<N;++i) cin>>arr[i];
 
-    vector<int> prime;
+    int n1 = N/2;
+    int n2 = N-n1;
 
-    prime.push_back(0);
-    for(int i=2;i<=N;++i)
-        if(ets[i]) prime.push_back(i);
+    
+    vector<int> A = subset(arr,n1,C);
+    vector<int> B = subset(arr+n1,n2,C);
 
-    long unsigned int l,r;
+    sort(B.begin(), B.end());
 
-    l=r=0;
-    int c = prime[0];
-    int cnt=0;
-    while(l<=r && r<prime.size()){
-        if(c>N)
-            c-=prime[l++];
-        else if(c<N)
-            c+=prime[++r];
-        else{
-            ++cnt;
-            c-=prime[l++];
-            c+=prime[++r];
-        }
+    int ans=0;
+    int rC;
+    for(int i : A){
+        rC = C-i;
+        ans +=upper_bound(B.begin(), B.end(), rC)-B.begin();
     }
 
-    cout<<cnt;
+    cout<<ans;
 
     return 0;
 }
