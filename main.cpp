@@ -2,58 +2,46 @@
 #define INF (int)1e9
 using namespace std;
 
-int arr[30];
+int fileArr[500];
+int dp[500][500];
+int pSum[500];
 
-vector<int> subset(int* arr, int n, int lim){
-
-    vector<int> set;
-
-    int c;
-    bool f;
-    for(int bit=0;bit<(1<<n);++bit){
-        c=0;
-        f=1;
-        for(int i=0;i<n;++i){
-            if(bit&(1<<i)){
-                c+=arr[i];
-                if(c>lim){
-                    f=0;
-                    break;
-                }
-            }
+int solve(int i, int j){
+    if(i == j) return 0;
+    
+    int &ret = dp[i][j];
+    if(ret != -1) return ret;
+    
+    ret = INF;
+    
+    for(int m=i; m<j; ++m){
+        ret = min(ret,
+            solve(i,m) + solve(m+1,j) + pSum[j] - (i ? pSum[i-1] : 0));
         }
         
-        if(f) set.push_back(c);
-    }
-    return set;
+    return ret;
 }
 
-int main() {
+int main(){
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
-
-    int N,C;
-    cin>>N>>C;
-
-    for(int i=0;i<N;++i) cin>>arr[i];
-
-    int n1 = N/2;
-    int n2 = N-n1;
-
     
-    vector<int> A = subset(arr,n1,C);
-    vector<int> B = subset(arr+n1,n2,C);
+    int T;
+    cin>>T;
+    
+    int k;
+    while(T--){
+        cin>>k;
 
-    sort(B.begin(), B.end());
+        for(int i=0;i<k;++i)
+            cin>>fileArr[i];
 
-    int ans=0;
-    int rC;
-    for(int i : A){
-        rC = C-i;
-        ans +=upper_bound(B.begin(), B.end(), rC)-B.begin();
+        pSum[0] = fileArr[0];
+        for(int i=1;i<k;++i)
+            pSum[i] = pSum[i-1] + fileArr[i];
+
+        memset(dp, -1, sizeof(dp));
+
+        cout<<solve(0, k-1)<<'\n';
     }
-
-    cout<<ans;
-
-    return 0;
 }
