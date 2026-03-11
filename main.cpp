@@ -2,46 +2,38 @@
 #define INF (int)1e9
 using namespace std;
 
-int fileArr[500];
-int dp[500][500];
-int pSum[500];
-
-int solve(int i, int j){
-    if(i == j) return 0;
-    
-    int &ret = dp[i][j];
-    if(ret != -1) return ret;
-    
-    ret = INF;
-    
-    for(int m=i; m<j; ++m){
-        ret = min(ret,
-            solve(i,m) + solve(m+1,j) + pSum[j] - (i ? pSum[i-1] : 0));
-        }
-        
-    return ret;
-}
+int arr[200000];
+int idxCnt[10];
 
 int main(){
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
     
-    int T;
-    cin>>T;
-    
-    int k;
-    while(T--){
-        cin>>k;
+    int N;
+    cin>>N;
 
-        for(int i=0;i<k;++i)
-            cin>>fileArr[i];
+    for(int i=0;i<N;++i) cin>> arr[i];
 
-        pSum[0] = fileArr[0];
-        for(int i=1;i<k;++i)
-            pSum[i] = pSum[i-1] + fileArr[i];
+    int l,r,k,ans;
+    l=k=ans=0;
+    r=-1;
+    memset(idxCnt, 0, sizeof(idxCnt));
+    while(r<N){
+        while(r<N && k<3){  //되는데까지 늘리기
+            ++r;
+            if(idxCnt[arr[r]]==0) ++k;
+            ++idxCnt[arr[r]];
+        }
+        ans=max(ans, r-l);
 
-        memset(dp, -1, sizeof(dp));
-
-        cout<<solve(0, k-1)<<'\n';
+        while(l<r && k>2){  //최대한 줄이기(시작점 찾기)
+            --idxCnt[arr[l]];
+            if(idxCnt[arr[l]]==0) --k;
+            ++l;
+        }
     }
+    
+    cout<<ans;
+
+    return 0;
 }
