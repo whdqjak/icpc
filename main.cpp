@@ -2,38 +2,78 @@
 #define INF (int)1e9
 using namespace std;
 
-int arr[200000];
-int idxCnt[10];
+
 
 int main(){
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
     
-    int N;
-    cin>>N;
+    int T;
+    cin>>T;
 
-    for(int i=0;i<N;++i) cin>> arr[i];
+    while(T--){
+        string odr;
+        int n;
+        string list;
+        deque<int> dq;
 
-    int l,r,k,ans;
-    l=k=ans=0;
-    r=-1;
-    memset(idxCnt, 0, sizeof(idxCnt));
-    while(r<N){
-        while(r<N && k<3){  //되는데까지 늘리기
-            ++r;
-            if(idxCnt[arr[r]]==0) ++k;
-            ++idxCnt[arr[r]];
+        cin>>odr;
+        cin>>n;
+        cin>>list;
+
+        int rn = 0;
+        bool f = 0; //rn이 숫자로 제작 됐는지 안됐는지
+        for(int i=1;i<list.size();++i){
+            if('0'<=list[i] && list[i]<='9'){
+                f=1;
+
+                rn*=10;
+                rn+=list[i]-'0';
+            }
+            else if(f){
+                dq.push_back(rn);
+                rn=0;
+                f=0;
+            }
         }
-        ans=max(ans, r-l);
 
-        while(l<r && k>2){  //최대한 줄이기(시작점 찾기)
-            --idxCnt[arr[l]];
-            if(idxCnt[arr[l]]==0) --k;
-            ++l;
+        int r = 1;  // 1은 정방향 -1은 역방향
+        bool er=0;  //error
+        for(int i=0;i<odr.size();++i){
+            if(odr[i]=='R') r*=-1;
+            else{   //D
+                if(dq.empty()){
+                    er=1;
+                    break;
+                }
+                else if(r==1) dq.pop_front();
+                else dq.pop_back();
+            }
+        }
+
+        //출력부분
+        if(er) cout<<"error\n";
+        else{
+            cout<<'[';
+            if(r==1 && !dq.empty()){
+                cout<<dq.front();
+                dq.pop_front();
+                while(!dq.empty()){
+                    cout<<','<<dq.front();
+                    dq.pop_front();
+                }
+            }
+            else if(r==-1 && !dq.empty()){
+                cout<<dq.back();
+                dq.pop_back();
+                while(!dq.empty()){
+                    cout<<','<<dq.back();
+                    dq.pop_back();
+                }
+            }
+            cout<<"]\n";
         }
     }
     
-    cout<<ans;
-
     return 0;
 }

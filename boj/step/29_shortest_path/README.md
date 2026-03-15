@@ -75,6 +75,8 @@ vector<long long> bellmanFord(int st){
 }
 
 ## 플로이드
+-거리 초기화는 표준은 INF로 하기.(min으로 거리비교 해서 -1같은걸로 하면 안됨)
+
 
 //초기버전
 int V;
