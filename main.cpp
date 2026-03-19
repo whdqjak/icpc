@@ -2,78 +2,68 @@
 #define INF (int)1e9
 using namespace std;
 
+int N,M;
 
+int ground[500][500];
+int dp[500][500];
+
+int dx[4]={0,0,1,-1};
+int dy[4]={1,-1,0,0};
+
+// int f(int x, int y){
+    
+//     if(x==N-1 && y==M-1) return 1;
+
+//     int& ret=dp[x][y];
+//     if(ret!=-1) return ret;
+
+
+//     ret = 0;
+//     int ux,uy;
+//     for(int i=0;i<4;++i){
+//         ux = x+dx[i];
+//         uy = y+dy[i];
+//         if(ux<0 || uy<0 || ux>=N || uy>=M ||
+//             ground[x][y]<=ground[ux][uy]) continue;
+
+//         ret+=f(ux,uy);
+//     }
+
+//     return ret;
+// }
 
 int main(){
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
     
-    int T;
-    cin>>T;
+    cin>>N>>M;
 
-    while(T--){
-        string odr;
-        int n;
-        string list;
-        deque<int> dq;
+    for(int i=0;i<N;++i)
+        for(int j=0;j<M;++j)
+            cin>>ground[i][j];
 
-        cin>>odr;
-        cin>>n;
-        cin>>list;
+    memset(dp, -1, sizeof(dp));
 
-        int rn = 0;
-        bool f = 0; //rn이 숫자로 제작 됐는지 안됐는지
-        for(int i=1;i<list.size();++i){
-            if('0'<=list[i] && list[i]<='9'){
-                f=1;
 
-                rn*=10;
-                rn+=list[i]-'0';
+    dp[N-1][M-1]=1;
+
+    int ux,uy;
+    for(int i=N-2;i>=0;--i){
+        for(int j=M-2;j>=0;--j){
+            dp[i][j]=0;
+            for(int d=0;d<4;++d){
+                ux = i+dx[d];
+                uy = j+dy[d];
+                if(ux<0 || uy<0 || ux>=i || uy>=j ||
+                     ground[x][y]>=ground[ux][uy]) continue;
+                    
+                dp[i][j]+=dp[ux][uy];
             }
-            else if(f){
-                dq.push_back(rn);
-                rn=0;
-                f=0;
-            }
-        }
-
-        int r = 1;  // 1은 정방향 -1은 역방향
-        bool er=0;  //error
-        for(int i=0;i<odr.size();++i){
-            if(odr[i]=='R') r*=-1;
-            else{   //D
-                if(dq.empty()){
-                    er=1;
-                    break;
-                }
-                else if(r==1) dq.pop_front();
-                else dq.pop_back();
-            }
-        }
-
-        //출력부분
-        if(er) cout<<"error\n";
-        else{
-            cout<<'[';
-            if(r==1 && !dq.empty()){
-                cout<<dq.front();
-                dq.pop_front();
-                while(!dq.empty()){
-                    cout<<','<<dq.front();
-                    dq.pop_front();
-                }
-            }
-            else if(r==-1 && !dq.empty()){
-                cout<<dq.back();
-                dq.pop_back();
-                while(!dq.empty()){
-                    cout<<','<<dq.back();
-                    dq.pop_back();
-                }
-            }
-            cout<<"]\n";
         }
     }
+
+
+    cout<<f(0,0);
     
     return 0;
 }
