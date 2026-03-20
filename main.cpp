@@ -2,68 +2,47 @@
 #define INF (int)1e9
 using namespace std;
 
-int N,M;
+int N;
+int wt[30];
+bool dp[15001][30];
+bool check[15001][30];
 
-int ground[500][500];
-int dp[500][500];
+bool f(int bw, int b){   //a에서 b까지로 bw를 만들 수 있는지 없는지
 
-int dx[4]={0,0,1,-1};
-int dy[4]={1,-1,0,0};
+    if(bw>15000) return 0;
+    if(b<0) return (bw==0);
 
-// int f(int x, int y){
+    bool& ret = dp[bw][b];
+    if(check[bw][b]) return ret;
+
+    check[bw][b]=1;
+    ret = 0;
     
-//     if(x==N-1 && y==M-1) return 1;
+    ret |= f(bw, b-1);
 
-//     int& ret=dp[x][y];
-//     if(ret!=-1) return ret;
+    ret |= f(bw+wt[b], b-1);
 
+    ret |= f(abs(bw-wt[b]), b-1);
 
-//     ret = 0;
-//     int ux,uy;
-//     for(int i=0;i<4;++i){
-//         ux = x+dx[i];
-//         uy = y+dy[i];
-//         if(ux<0 || uy<0 || ux>=N || uy>=M ||
-//             ground[x][y]<=ground[ux][uy]) continue;
-
-//         ret+=f(ux,uy);
-//     }
-
-//     return ret;
-// }
+    return ret;
+}
 
 int main(){
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
     
-    cin>>N>>M;
+    cin>>N;
+    for(int i=0;i<N;++i) cin>>wt[i];
 
-    for(int i=0;i<N;++i)
-        for(int j=0;j<M;++j)
-            cin>>ground[i][j];
+    int M;
+    cin>>M;
 
-    memset(dp, -1, sizeof(dp));
-
-
-    dp[N-1][M-1]=1;
-
-    int ux,uy;
-    for(int i=N-2;i>=0;--i){
-        for(int j=M-2;j>=0;--j){
-            dp[i][j]=0;
-            for(int d=0;d<4;++d){
-                ux = i+dx[d];
-                uy = j+dy[d];
-                if(ux<0 || uy<0 || ux>=i || uy>=j ||
-                     ground[x][y]>=ground[ux][uy]) continue;
-                    
-                dp[i][j]+=dp[ux][uy];
-            }
-        }
+    int bw;
+    for(int i=0;i<M;++i){
+        cin>>bw;
+        if(f(bw,N-1)) cout<<"Y ";
+        else cout<<"N ";
     }
-
-
-    cout<<f(0,0);
     
     return 0;
 }
