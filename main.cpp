@@ -1,8 +1,9 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-int arr[1001];
-int dp[1001];
+int arr[1000000];
+vector<pair<int, int>> dp;  //{값, 인덱스}
+int nxt[1000000];
 
 int main(){
     ios::sync_with_stdio(false);
@@ -11,32 +12,41 @@ int main(){
     int N;
     cin>>N;
 
-    for(int i=1;i<=N;++i) cin>>arr[i];
-    
+    for(int i=0;i<N;++i) cin>>arr[i];
 
-    int ans=0;
-    int ans_i=0;
-    for(int i = 1;i<=N;++i){
-        dp[i] = 1;
-        for(int j=1;j<i;++j)
-            if(arr[j]<arr[i]) dp[i] = max(dp[i], dp[j]+1);
-        if(ans<dp[i]) ans=dp[i], ans_i=i;
+    pair<int, int> x;
+    int idx;
+
+    for(int i=0;i<N;++i){
+        x.first = arr[i];
+        x.second = i;
+
+        idx = lower_bound(dp.begin(), dp.end(), x,
+        [](const pair<int,int>& a, const pair<int,int>& b){
+        return a.first < b.first;
+        })-dp.begin();
+        
+        if(idx==0) nxt[i] = -1;
+        else nxt[i] = dp[idx-1].second;
+
+        if(idx==dp.size()) dp.push_back(x);
+        else dp[idx] = x;
+
     }
 
+    cout<<dp.size()<<'\n';
 
-    cout<<ans<<'\n';
+    vector<int> ans;
 
-    vector<int> tb;
-    
-    tb.push_back(arr[ans_i]);
-
-    int c_i=ans_i;
-    for(int i = ans_i;i>=1;--i){
-        if(arr[c_i]>arr[i] && dp[c_i]-1 == dp[i]) tb.push_back(arr[i]), c_i=i;
+    int c = dp[dp.size()-1].second;
+    while(1){
+        ans.push_back(arr[c]);
+        c=nxt[c];
+        if(c==-1) break;
     }
 
-    reverse(tb.begin(), tb.end());
-    for(int i : tb) cout<<i<<" ";
+    reverse(ans.begin(), ans.end());
+    for(int i:ans) cout<<i<<' ';
 
     return 0;
 }
