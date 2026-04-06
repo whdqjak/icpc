@@ -9,6 +9,13 @@ int main(){
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
 
+    //operator
+
+    //~
+
+    //--------------------
+    
+
     //람다 함수
     [capture](parameters) -> return_type {
         body

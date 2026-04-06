@@ -1,52 +1,68 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-int arr[1000000];
-vector<pair<int, int>> dp;  //{값, 인덱스}
-int nxt[1000000];
+int a,b,k;
+int dp[1000001];
+bool visited[1000001];
+
+int cal(int n){
+    
+    int ret=0;
+    int d1,d2;
+    while(n){
+        d1=1;
+        d2=n%10;
+        for(int i=0;i<k;++i) d1*=d2;
+        ret+=d1;
+
+        n/=10;
+    }
+    
+    return ret;
+}
+
+int solve(int n){
+    if(n>1000000) return solve(cal(n));
+    if(dp[n]!=-1) return dp[n];
+
+    vector<int> p;
+    if(visited[n]){
+        p.push_back(n);
+        int mn=n;
+        int nxt = cal(n);
+        while(nxt!=n){
+            p.push_back(nxt);   
+            mn=min(mn,nxt);
+            nxt=cal(nxt);
+        }
+
+        for(int i:p) dp[i] = mn;
+
+        return mn;
+    }
+
+    
+    visited[n]=1;
+    int ret = min(n,solve(cal(n)));
+    visited[n]=0;
+
+    return dp[n]=ret;
+}
 
 int main(){
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
     
-    int N;
-    cin>>N;
+    
+    cin>>a>>b>>k;
+    
+    memset(dp,-1,sizeof(dp));
 
-    for(int i=0;i<N;++i) cin>>arr[i];
+    int ans=0;
+    for(int i=a;i<=b;++i)
+        ans+=solve(i);
 
-    pair<int, int> x;
-    int idx;
-
-    for(int i=0;i<N;++i){
-        x.first = arr[i];
-        x.second = i;
-
-        idx = lower_bound(dp.begin(), dp.end(), x,
-        [](const pair<int,int>& a, const pair<int,int>& b){
-        return a.first < b.first;
-        })-dp.begin();
-        
-        if(idx==0) nxt[i] = -1;
-        else nxt[i] = dp[idx-1].second;
-
-        if(idx==dp.size()) dp.push_back(x);
-        else dp[idx] = x;
-
-    }
-
-    cout<<dp.size()<<'\n';
-
-    vector<int> ans;
-
-    int c = dp[dp.size()-1].second;
-    while(1){
-        ans.push_back(arr[c]);
-        c=nxt[c];
-        if(c==-1) break;
-    }
-
-    reverse(ans.begin(), ans.end());
-    for(int i:ans) cout<<i<<' ';
+    cout<<ans;
 
     return 0;
 }
